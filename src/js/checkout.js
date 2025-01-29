@@ -1,29 +1,25 @@
-import { qs, loadHeaderFooter, updateCartNumIcon } from "./utils.mjs";
-import checkoutProcess from "./CheckoutProcess.mjs";
+import { loadHeaderFooter } from "./utils.mjs";
+import CheckoutProcess from "./CheckoutProcess.mjs";
 
-const summary = qs("#order-summary"),
-  checkout = new checkoutProcess("so-cart", summary);
+loadHeaderFooter();
 
-//load page functinos
-pageInit();
+const myCheckout = new CheckoutProcess("so-cart", ".checkout-summary");
+myCheckout.init();
 
-/**
- * Wrapper for our page functionality
- */
-async function pageInit() {
-  // Await loading header and fooder so cart icon updates apprpriately
-  await loadHeaderFooter();
-  updateCartNumIcon();
+document
+  .querySelector("#zip")
+  .addEventListener("blur", myCheckout.calculateOrdertotal.bind(myCheckout));
+// listening for click on the button
+document.querySelector("#checkoutSubmit").addEventListener("click", (e) => {
+  e.preventDefault();
 
-  // Calculate the order and display the summary
-  checkout.init();
+  myCheckout.checkout();
+});
 
-  // Listener for submit button
-  qs("#checkout").addEventListener("click", (e) => {
-    e.preventDefault();
-    var myForm = document.forms[0];
-    var chk_status = myForm.checkValidity();
-    myForm.reportValidity();
-    if (chk_status) checkout.checkout(myForm);
-  });
-}
+// this is how it would look if we listen for the submit on the form
+// document.forms['checkout']
+// .addEventListener('submit', (e) => {
+//   e.preventDefault();
+//   // e.target would contain our form in this case
+//    myCheckout.checkout();
+// });
